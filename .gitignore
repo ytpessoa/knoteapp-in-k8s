@@ -1,0 +1,6 @@
+**node_modules
+
+**01-APPLICATION-ONLY/public/uploads/*
+**02-CONTAINERISATION-WITH-DOCKER/public/uploads/*
+PROJECT-FULL/public/uploads/*
+*.tar

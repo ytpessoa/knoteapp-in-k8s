@@ -1,0 +1,106 @@
+############################
+# Containerising the app   #
+############################
+
+#1 - Install Docker Engine on Ubuntu and test
+sudo docker run hello-world
+    #Hello from Docker!
+
+#2 -Construir Dockerfile na raiz do projeto
+# Dockerfile(https://docs.docker.com/engine/reference/builder/):
+    #- receita;
+    #- sequencia de comandos
+
+################### Dockerfile ######################################################################
+#defines the base layer for the container, in this case, a version of Ubuntu with Node.js installed:
+#downloaded it automatically from Docker Hub
+FROM node:12.0-slim
+#copies the files of your app into the container: source -> destination:
+COPY . .  
+# executes inside the container:
+RUN npm install
+# defines the command that should be executed when the container starts
+CMD ["node", "index.js"]
+###################################################################################################
+
+# -t : tag 
+# knote: name
+# . : current
+$ sudo docker build -t knote .
+#output: Docker image
+
+#List all the images:
+$ sudo docker images
+# REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+# knote               latest              f716ab533253        7 minutes ago       175MB
+# hello-world         latest              bf756fb1ae65        3 months ago        13.3kB
+# node                12.0-slim           8
+
+#Save the image locally 
+$ sudo docker save knote > knote.tar
+
+
+#3- Docker network 
+$ sudo docker network create knote-net
+
+#3.1 mongo's image:
+$ sudo docker run \
+  --name=mongo \
+  --rm \
+  --network=knote-net mongo
+
+$ sudo docker run \
+  --name=knote \
+  --rm \
+  --network=knote-net \
+  -p 3000:3000 \
+  -e MONGO_URL=mongodb://mongo:27017/dev \
+  knote
+
+
+$ sudo docker images
+
+$ sudo docker ps
+$ sudo docker ps
+# CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+# ba39f576eede        knote               "node index.js"          5 minutes ago       Up 5 minutes        0.0.0.0:3001->3001/tcp   knote
+# 98e6b80f75c5        mongo               "docker-entrypoint.s…"   7 minutes ago       Up 7 minutes        27017/tcp                mongo
+
+#Test:
+http://localhost:3000
+
+# The end:
+$ sudo docker stop mongo knote
+# mongo
+# knote
+$ sudo docker rm mongo knote
+
+
+#5 - Uploading the container image to a container registry
+
+# https://hub.docker.com/
+#your ID is: ytpessoa
+$ sudo docker login
+$ docker tag knote ytpessoa/knote-js:1.0.0
+$ docker push ytpessoa/knote-js:1.0.0
+#Your image: ytpessoa/knote-js:1.0.0
+
+#Test from the Docker Hub:
+
+$ sudo docker run \
+  --name=mongo \
+  --rm \
+  --network=knote \
+  mongo
+
+  
+$ sudo docker run \
+  --name=knote \
+  --rm \
+  --network=knote \
+  -p 3000:3000 \
+  -e MONGO_URL=mongodb://mongo:27017/dev \
+  ytpessoa/knote-js:1.0.0
+
+$ sudo docker stop mongo knote
+$ sudo docker rm mongo knote

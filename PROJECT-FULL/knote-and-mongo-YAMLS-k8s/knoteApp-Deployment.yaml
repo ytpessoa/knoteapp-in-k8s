@@ -1,0 +1,48 @@
+# Deployment Resource: define como executar um aplicativo no cluster, 
+#                      mas não o disponibiliza para outros aplicativos.
+# Deployment enables declarative updates for Pods and ReplicaSets.
+---
+# Version of this resource type
+apiVersion: apps/v1
+# Define o esquema com versão dessa representação de um objeto. 
+# Os servidores devem converter esquemas reconhecidos no valor interno
+# mais recente e podem rejeitar valores não reconhecidos.
+
+# Type of resource
+kind: Deployment # Reference: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#deployment-v1-apps
+# representa o recurso REST que este objeto representa. 
+# Os servidores podem inferir isso a partir do endpoint(terminal) 
+# para o qual o cliente envia solicitações. Não pode ser atualizado. 
+# Em CamelCase.
+
+
+# Name of this specific resource
+# Standard object metadata.
+metadata: #<Object>  
+  name: knote
+
+# Specification of the desired behavior(comportamento) of the Deployment.
+spec: #<Object>  
+  replicas: 1 #desired number of replicas of your Pod(containers)
+  
+  # Vincula o recurso Deployment às réplicas do Pod:
+  selector: # Seleciona os Pods com um rótulo(label) "app: knote"  para pertencer a este recurso de Deployment.
+    matchLabels:
+      app: knote
+  #Defines a label for the Pods that wrap your container 
+  template:
+    metadata:
+      labels: #vincula Deployment ao seu Service
+        app: knote #container 
+    
+    #Container real que deseja-se executar:
+    spec:
+      containers:
+        - name: knote #name for the container 
+          image: ytpessoa/knote-js:1.0.0.0 #name of the Docker image, criada anteriormente.        
+          ports:
+            - containerPort: 3000 #porta que o conteiner escuta
+          env: # Variável de ambiente (MONGO_URL) que será disponibilizada para o processo no contêiner.
+            - name: MONGO_URL
+              value: mongodb://mongo:27017/dev # "mongo" is name of the MongoDB Service 
+          imagePullPolicy: Always # Força o download da imagem do Docker, mesmo que já tenha sido baixada.
