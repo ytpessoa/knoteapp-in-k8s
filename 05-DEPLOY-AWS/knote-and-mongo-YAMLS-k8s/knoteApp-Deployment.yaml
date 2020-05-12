@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: knote
+spec: 
+  replicas: 1   
+  selector: # Seleciona os Pods com um rótulo(label) "app: knote"  para pertencer a este recurso de Deployment.
+    matchLabels:
+      app: knote
+  template:
+    metadata:
+      labels: #vincula Deployment ao seu Service
+        app: knote #container     
+    spec:
+      containers:
+        - name: knote #name for the container         
+          image: ytpessoa/knote-js:2.0.0 #name of the Docker image, criada anteriormente.        
+          ports:
+            - containerPort: 3000 #porta que o conteiner escuta
+          env: # Variável de ambiente (MONGO_URL) que será disponibilizada para o processo no contêiner.
+            - name: MONGO_URL
+              value: mongodb://mongo:27017/dev # "mongo" is name of the MongoDB Service 
+            - name: MINIO_ACCESS_KEY
+              value: "123"
+            - name: MINIO_SECRET_KEY
+              value: "12345678"
+            - name: MINIO_HOST
+              value: minio
+          imagePullPolicy: Always # Força o download da imagem do Docker, mesmo que já tenha sido baixada.

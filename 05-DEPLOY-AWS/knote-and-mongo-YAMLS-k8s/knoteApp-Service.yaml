@@ -1,0 +1,15 @@
+
+# $ kubectl explain service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knote
+spec:
+  selector: #Pods com label(rótulo) "app: knote" serão expostos pelo Service.
+    app: knote
+  ports:
+    - port: 80 #Service escuta na porta 80
+      targetPort: 3000 #Service encaminha na porta 3000 -> target Pods
+  type: LoadBalancer # LoadBalancer: torna os Pods expostos acessíveis de fora do cluster.
+                     # ClusterIP: torna os Pods expostos acessíveis dentro do  cluster.

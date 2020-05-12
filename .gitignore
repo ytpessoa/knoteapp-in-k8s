@@ -5,3 +5,4 @@
 PROJECT-FULL/public/uploads/*
 *.tar
 04-SCALING/APPLICATION-REFACTORED/public/uploads/*
+*.pdf
